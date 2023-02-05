@@ -10,7 +10,7 @@ class Menu:
         self.animation_time = 0
         self.contents = []
         self.contents_height = 0
-        self.cx = max(
+        self.selections_width = max(
             [
                 pygame.font.SysFont(
                     config.DEFAULT_TEXT_FONT_NAME, config.SELECTION_MAX_SIZE
@@ -18,7 +18,7 @@ class Menu:
                 for v in selections
             ]
         )
-        self.cy = (
+        self.selections_height = (
             len(selections) * config.SELECTION_MAX_SIZE
             + (len(selections) - 1) * config.SELECTION_SEP_SIZE
         )
@@ -38,8 +38,10 @@ class Menu:
 
     def get_idx_from_screen(self, pos) -> int:
         x, y = pos
-        if abs(x - config.WINDOW_WIDTH / 2) <= self.cx / 2:
-            start_y = (config.WINDOW_HEIGHT + self.contents_height - self.cy) / 2
+        if abs(x - config.WINDOW_WIDTH / 2) <= self.selections_width / 2:
+            start_y = (
+                config.WINDOW_HEIGHT + self.contents_height - self.selections_height
+            ) / 2
             idx = math.floor(
                 (y - start_y - config.SELECTION_SEP_SIZE / 2)
                 / (config.SELECTION_MAX_SIZE + config.SELECTION_SEP_SIZE)

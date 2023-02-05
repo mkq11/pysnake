@@ -161,20 +161,20 @@ def draw_game(surface: pygame.Surface, manager: game.GameManager, score: bool = 
         draw_score(surface, manager.get_score(), 20, 5)
 
 
-def draw_menu(surface: pygame.Surface, menu: menu.Menu):
-    drawing_y = (surface.get_height() - menu.contents_height - menu.cy) / 2
+def draw_menu(surface: pygame.Surface, game_menu: menu.Menu):
+    drawing_y = (surface.get_height() - game_menu.contents_height - game_menu.selections_height) / 2
     center_x = surface.get_width() / 2
 
-    for v in menu.contents:
+    for v in game_menu.contents:
         surface.blit(v, (center_x - v.get_width() / 2, drawing_y))
         drawing_y += v.get_height()
 
-    for i, selection in enumerate(menu.selections):
+    for i, selection in enumerate(game_menu.selections):
         size = config.SELECTION_MIN_SIZE
         color = UNSELECT_COLOR
-        if i == menu.select_idx:
+        if i == game_menu.select_idx:
             size += round(
-                (config.SELECT_ANIMATION_MAX_TIME - menu.animation_time)
+                (config.SELECT_ANIMATION_MAX_TIME - game_menu.animation_time)
                 / config.SELECT_ANIMATION_MAX_TIME
                 * (config.SELECTION_MAX_SIZE - config.SELECTION_MIN_SIZE)
             )
@@ -182,7 +182,7 @@ def draw_menu(surface: pygame.Surface, menu: menu.Menu):
 
             triangle_size = config.SELECTION_MAX_SIZE / 4
             base = (
-                center_x - menu.cx / 2 - triangle_size,
+                center_x - game_menu.selections_width / 2 - triangle_size,
                 drawing_y + config.SELECTION_MAX_SIZE / 2,
             )
             triangle = [
