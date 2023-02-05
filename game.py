@@ -52,9 +52,6 @@ class SnakeKeyPoint:
 
 
 class Snake:
-    def __init__(self, x, y):
-        self.reset(x, y)
-
     def move(self, time):
         self.state_time -= time
         if self.state_time < 0:
@@ -152,7 +149,7 @@ class GameManager:
     def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.snake = Snake(0, 0)
+        self.snake = Snake()
         self.foods = []
         self.reset_game()
 
