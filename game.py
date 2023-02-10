@@ -1,6 +1,7 @@
 import math
 import random
 import pygame
+from typing import Hashable
 
 FOOD_TYPE_NORMAL = -1
 FOOD_TYPE_DOUBLESCORE = 0
@@ -19,8 +20,13 @@ SNAKE_STATE_SLOWDOWN = 2
 SNAKE_INITIAL_LENGTH = 3
 
 
+class GamePoint:
+    x: float
+    y: float
+
+
 class Food:
-    def __init__(self, xmin, xmax, ymin, ymax):
+    def __init__(self, xmin: float, xmax: float, ymin: float, ymax: float) -> None:
         xmu = (xmin + xmax) / 2
         xvar = (xmax - xmin) / 4
         self.x = random.normalvariate(xmu, xvar)
@@ -37,22 +43,22 @@ class Food:
         if self.type > 2:
             self.type = FOOD_TYPE_NORMAL
 
-    def is_close_to(self, pos):
+    def is_close_to(self, pos: GamePoint) -> bool:
         return (pos.x - self.x) ** 2 + (pos.y - self.y) ** 2 < 1
 
 
 class SnakeKeyPoint:
-    def __init__(self, x, y, orientation):
+    def __init__(self, x: float, y: float, orientation) -> None:
         self.x = x
         self.y = y
         self.orientation = orientation
 
-    def distance(self, pos):
+    def distance(self, pos: GamePoint) -> float:
         return math.sqrt((self.x - pos.x) ** 2 + (self.y - pos.y) ** 2)
 
 
 class Snake:
-    def move(self, time):
+    def move(self, time: float) -> None:
         self.state_time -= time
         if self.state_time < 0:
             self.state = SNAKE_STATE_NORMAL
@@ -81,7 +87,7 @@ class Snake:
                     length_sum -= last_length
                     self.key_points.pop()
 
-    def eat(self, food):
+    def eat(self, food: Food) -> None:
         self.length += 1
         if food.type == FOOD_TYPE_DOUBLESCORE:
             self.length += 1
@@ -92,7 +98,7 @@ class Snake:
             self.state = SNAKE_STATE_SLOWDOWN
             self.state_time = 50 / self.get_speed()
 
-    def is_close_to_body(self, pos):
+    def is_close_to_body(self, pos: GamePoint) -> bool:
         length_sum = 0
         for k1, k2 in zip(self.key_points[:-1], self.key_points[1:]):
             last_sum = length_sum
@@ -119,7 +125,7 @@ class Snake:
                         return True
         return False
 
-    def set_orientation(self, orientation):
+    def set_orientation(self, orientation: Hashable) -> None:
         front = self.key_points[0]
         if len(self.key_points) >= 2:
             if orientation == front.orientation:
@@ -130,7 +136,7 @@ class Snake:
                 return
         self.key_points.insert(0, SnakeKeyPoint(front.x, front.y, orientation))
 
-    def get_speed(self):
+    def get_speed(self) -> float:
         speed = (self.length + 5) / 2
         if self.state == SNAKE_STATE_SPEEDUP:
             speed *= 2
@@ -138,7 +144,7 @@ class Snake:
             speed /= 2
         return speed
 
-    def reset(self, x, y):
+    def reset(self, x: float, y: float) -> None:
         self.length = SNAKE_INITIAL_LENGTH
         self.key_points = [SnakeKeyPoint(x, y, SNAKE_LEFT)]
         self.state = SNAKE_STATE_NORMAL
@@ -146,14 +152,14 @@ class Snake:
 
 
 class GameManager:
-    def __init__(self, width, height):
+    def __init__(self, width: int, height: int) -> None:
         self.width = width
         self.height = height
         self.snake = Snake()
         self.foods = []
         self.reset_game()
 
-    def update(self, dt):
+    def update(self, dt: float) -> None:
         if not self.playing or self.end != 0:
             return
 
@@ -179,19 +185,19 @@ class GameManager:
             self.create_new_food()
             self.food_time = 0
 
-    def reset_game(self):
+    def reset_game(self) -> None:
         self.end = 0
         self.playing = False
         self.snake.reset(self.width / 2, self.height / 2)
         self.foods.clear()
         self.food_time = max(self.width, self.height) / self.snake.get_speed() * 0.45
 
-    def set_snake_orientation(self, orientation):
+    def set_snake_orientation(self, orientation: Hashable) -> None:
         if self.end == 0:
             self.playing = True
             self.snake.set_orientation(orientation)
 
-    def create_new_food(self):
+    def create_new_food(self) -> None:
         satisfy = False
         while not satisfy:
             new_food = Food(0, self.width - 1, 0, self.height - 1)
@@ -207,10 +213,10 @@ class GameManager:
                 satisfy = False
         self.foods.append(new_food)
 
-    def get_score(self):
+    def get_score(self) -> int:
         return self.snake.length - SNAKE_INITIAL_LENGTH
 
-    def handle_event(self, event):
+    def handle_event(self, event: pygame.event.Event) -> None:
         if self.end == 0:
             if event.type == pygame.KEYDOWN:
                 if event.key in [pygame.K_UP, pygame.K_w]:

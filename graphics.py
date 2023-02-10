@@ -32,7 +32,7 @@ def fill_aarectangle(
     y1: float,
     x2: float,
     y2: float,
-):
+) -> None:
     x1f = math.floor(x1)
     y1f = math.floor(y1)
     width = math.ceil(x2) - x1f
@@ -62,7 +62,7 @@ def fill_aarectangle(
 
 def fill_aacircle(
     surface: pygame.Surface, color: pygame.Color, x: float, y: float, r: float
-):
+) -> None:
     rx_floor = math.floor(x - r)
     ry_floor = math.floor(y - r)
     width = math.ceil(x + r) - rx_floor
@@ -87,7 +87,7 @@ def fill_aacircle(
     surface.blit(aasurface, (rx_floor, ry_floor))
 
 
-def draw_snake(surface: pygame.Surface, snake: game.Snake):
+def draw_snake(surface: pygame.Surface, snake: game.Snake) -> None:
     for k1, k2 in zip(snake.key_points[:-1], snake.key_points[1:]):
         o = k1.orientation
         fill_aacircle(
@@ -121,7 +121,7 @@ def draw_snake(surface: pygame.Surface, snake: game.Snake):
     )
 
 
-def draw_foods(surface: pygame.Surface, foods: list[game.Food]):
+def draw_foods(surface: pygame.Surface, foods: list[game.Food]) -> None:
     for food in foods:
         fill_aacircle(
             surface,
@@ -147,13 +147,15 @@ def render_score(score: int, font_size: int) -> pygame.Surface:
     return surface
 
 
-def draw_score(surface: pygame.Surface, score: int, font_size: int, y: int):
+def draw_score(surface: pygame.Surface, score: int, font_size: int, y: int) -> None:
     rs = render_score(score, font_size)
     start_x = (surface.get_width() - rs.get_width()) // 2
     surface.blit(rs, (start_x, y))
 
 
-def draw_game(surface: pygame.Surface, manager: game.GameManager, score: bool = True):
+def draw_game(
+    surface: pygame.Surface, manager: game.GameManager, score: bool = True
+) -> None:
     surface.fill(COLOR_WHITE)
     draw_snake(surface, manager.snake)
     draw_foods(surface, manager.foods)
@@ -161,8 +163,10 @@ def draw_game(surface: pygame.Surface, manager: game.GameManager, score: bool = 
         draw_score(surface, manager.get_score(), 20, 5)
 
 
-def draw_menu(surface: pygame.Surface, game_menu: menu.Menu):
-    drawing_y = (surface.get_height() - game_menu.contents_height - game_menu.selections_height) / 2
+def draw_menu(surface: pygame.Surface, game_menu: menu.Menu) -> None:
+    drawing_y = (
+        surface.get_height() - game_menu.contents_height - game_menu.selections_height
+    ) / 2
     center_x = surface.get_width() / 2
 
     for v in game_menu.contents:
@@ -200,7 +204,9 @@ def draw_menu(surface: pygame.Surface, game_menu: menu.Menu):
         drawing_y += config.SELECTION_MAX_SIZE + config.SELECTION_SEP_SIZE
 
 
-def draw_end(surface: pygame.Surface, manager: game.GameManager, end_menu: menu.Menu):
+def draw_end(
+    surface: pygame.Surface, manager: game.GameManager, end_menu: menu.Menu
+) -> None:
     draw_game(surface, manager, False)
     color = COLOR_WHITE
     color.a = 128
@@ -208,7 +214,7 @@ def draw_end(surface: pygame.Surface, manager: game.GameManager, end_menu: menu.
     draw_menu(surface, end_menu)
 
 
-def draw_help(surface: pygame.Surface):
+def draw_help(surface: pygame.Surface) -> None:
     color = COLOR_CYAN
     color.a = 180
     pygame.gfxdraw.box(surface, surface.get_rect(), color)

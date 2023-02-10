@@ -1,6 +1,7 @@
 import pygame
 import math
 import config
+from typing import Optional
 
 
 class Menu:
@@ -36,7 +37,7 @@ class Menu:
             self.select_idx = idx
             self.animation_time = config.SELECT_ANIMATION_MAX_TIME
 
-    def get_idx_from_screen(self, pos) -> int:
+    def get_idx_from_screen(self, pos: tuple[int, int]) -> int:
         x, y = pos
         if abs(x - config.WINDOW_WIDTH / 2) <= self.selections_width / 2:
             start_y = (
@@ -50,7 +51,7 @@ class Menu:
                 return idx
         return -1
 
-    def handle_event(self, event: pygame.event.Event) -> str:
+    def handle_event(self, event: pygame.event.Event) -> Optional[str]:
         if event.type == pygame.KEYDOWN:
             if event.key in [pygame.K_UP, pygame.K_w]:
                 self.select(self.select_idx - 1)
@@ -69,5 +70,3 @@ class Menu:
                 idx = self.get_idx_from_screen(event.pos)
                 if idx != -1:
                     return self.selections[idx]
-
-        return str()

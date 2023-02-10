@@ -5,7 +5,7 @@ import menu
 from config import *
 
 
-def create_start_menu():
+def create_start_menu() -> menu.Menu:
     start_menu = menu.Menu(["开始游戏", "帮助", "退出"])
     title_font = pygame.font.SysFont(DEFAULT_TEXT_FONT_NAME, 100, True)
     start_menu.add_content(title_font.render("贪吃蛇", True, graphics.COLOR_BLACK))
@@ -13,7 +13,7 @@ def create_start_menu():
     return start_menu
 
 
-def create_end_menu(score, reason):
+def create_end_menu(score: int, reason: int) -> menu.Menu:
     reason_text = "触碰边界" if reason == 1 else "触碰身体"
     reason_text = "结束原因：" + reason_text
     end_menu = menu.Menu(["重新开始", "退出"])
@@ -28,7 +28,7 @@ def create_end_menu(score, reason):
     return end_menu
 
 
-def show_start_menu(display):
+def show_start_menu(display: pygame.Surface) -> bool:
     start_menu = create_start_menu()
     clock = pygame.time.Clock()
     show_help = False
@@ -61,11 +61,11 @@ def show_start_menu(display):
         pygame.display.update()
 
 
-def main():
+def main() -> None:
     pygame.init()
     manager = game.GameManager(GAME_WIDTH, GAME_HEIGHT)
     display = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-    end_menu = create_end_menu(0, 0)
+    end_menu = menu.Menu([""])
     clock = pygame.time.Clock()
 
     keep_going = show_start_menu(display)
@@ -96,7 +96,7 @@ def main():
         else:
             graphics.draw_end(display, manager, end_menu)
         pygame.display.update()
-        
+
     pygame.quit()
 
 
