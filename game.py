@@ -1,26 +1,32 @@
 import math
 import random
 import pygame
-from typing import Hashable
-
-FOOD_TYPE_NORMAL = -1
-FOOD_TYPE_DOUBLESCORE = 0
-FOOD_TYPE_SPEEDUP = 1
-FOOD_TYPE_SLOWDOWN = 2
-
-SNAKE_UP = 0
-SNAKE_LEFT = 1
-SNAKE_RIGHT = 2
-SNAKE_DOWN = 3
-
-SNAKE_STATE_NORMAL = 0
-SNAKE_STATE_SPEEDUP = 1
-SNAKE_STATE_SLOWDOWN = 2
-
-SNAKE_INITIAL_LENGTH = 3
+import config
+from enum import Enum
+from typing import Hashable, Protocol
 
 
-class GamePoint:
+class FoodType(Enum):
+    NORMAL = 0
+    DOUBLESCORE = 1
+    SPEEDUP = 2
+    SLOWDOWN = 3
+
+
+class SnakeOrientation(Enum):
+    UP = 0
+    LEFT = 1
+    RIGHT = 2
+    DOWN = 3
+
+
+class SnakeState(Enum):
+    NORMAL = 0
+    SPEEDUP = 1
+    SLOWDOWN = 2
+
+
+class GamePoint(Protocol):
     x: float
     y: float
 
@@ -39,16 +45,17 @@ class Food:
         while not ymin < self.y < ymax:
             self.y = random.normalvariate(ymu, yvar)
 
-        self.type = random.randrange(0, 10)
-        if self.type > 2:
-            self.type = FOOD_TYPE_NORMAL
+        if random.randrange(10) < 7:
+            self.type = FoodType.NORMAL
+        else:
+            self.type = random.choice(list(FoodType))
 
     def is_close_to(self, pos: GamePoint) -> bool:
         return (pos.x - self.x) ** 2 + (pos.y - self.y) ** 2 < 1
 
 
 class SnakeKeyPoint:
-    def __init__(self, x: float, y: float, orientation) -> None:
+    def __init__(self, x: float, y: float, orientation: SnakeOrientation) -> None:
         self.x = x
         self.y = y
         self.orientation = orientation
@@ -61,13 +68,13 @@ class Snake:
     def move(self, time: float) -> None:
         self.state_time -= time
         if self.state_time < 0:
-            self.state = SNAKE_STATE_NORMAL
+            self.state = SnakeState.NORMAL
         next = self.key_points[0]
         step_size = time * self.get_speed()
         xmove = [0, -1, 1, 0]
         ymove = [-1, 0, 0, 1]
-        next.x += step_size * xmove[next.orientation]
-        next.y += step_size * ymove[next.orientation]
+        next.x += step_size * xmove[next.orientation.value]
+        next.y += step_size * ymove[next.orientation.value]
 
         length_sum = 0
         for i, j in zip(self.key_points[1:], self.key_points[:-1]):
@@ -89,13 +96,13 @@ class Snake:
 
     def eat(self, food: Food) -> None:
         self.length += 1
-        if food.type == FOOD_TYPE_DOUBLESCORE:
+        if food.type == FoodType.DOUBLESCORE:
             self.length += 1
-        if food.type == FOOD_TYPE_SPEEDUP:
-            self.state = SNAKE_STATE_SPEEDUP
+        if food.type == FoodType.SPEEDUP:
+            self.state = SnakeState.SPEEDUP
             self.state_time = 100 / self.get_speed()
-        if food.type == FOOD_TYPE_SLOWDOWN:
-            self.state = SNAKE_STATE_SLOWDOWN
+        if food.type == FoodType.SLOWDOWN:
+            self.state = SnakeState.SLOWDOWN
             self.state_time = 50 / self.get_speed()
 
     def is_close_to_body(self, pos: GamePoint) -> bool:
@@ -109,8 +116,8 @@ class Snake:
                 xchange = [0, 1, -1, 0]
                 ychange = [1, 0, 0, -1]
                 k1 = SnakeKeyPoint(
-                    k1.x + xchange[k1.orientation] * (1 - last_sum),
-                    k1.y + ychange[k1.orientation] * (1 - last_sum),
+                    k1.x + xchange[k1.orientation.value] * (1 - last_sum),
+                    k1.y + ychange[k1.orientation.value] * (1 - last_sum),
                     k1.orientation,
                 )
             if k2.distance(pos) < 1:
@@ -125,29 +132,29 @@ class Snake:
                         return True
         return False
 
-    def set_orientation(self, orientation: Hashable) -> None:
+    def set_orientation(self, orientation: SnakeOrientation) -> None:
         front = self.key_points[0]
         if len(self.key_points) >= 2:
             if orientation == front.orientation:
                 return
             if front.distance(self.key_points[1]) <= 1:
                 return
-            if front.orientation + orientation == 3:
+            if front.orientation.value + orientation.value == 3:
                 return
         self.key_points.insert(0, SnakeKeyPoint(front.x, front.y, orientation))
 
     def get_speed(self) -> float:
         speed = (self.length + 5) / 2
-        if self.state == SNAKE_STATE_SPEEDUP:
+        if self.state == SnakeState.SPEEDUP:
             speed *= 2
-        if self.state == SNAKE_STATE_SLOWDOWN:
+        if self.state == SnakeState.SLOWDOWN:
             speed /= 2
         return speed
 
     def reset(self, x: float, y: float) -> None:
-        self.length = SNAKE_INITIAL_LENGTH
-        self.key_points = [SnakeKeyPoint(x, y, SNAKE_LEFT)]
-        self.state = SNAKE_STATE_NORMAL
+        self.length = config.SNAKE_INITIAL_LENGTH
+        self.key_points = [SnakeKeyPoint(x, y, SnakeOrientation.LEFT)]
+        self.state = SnakeState.NORMAL
         self.state_time = 0.0
 
 
@@ -214,16 +221,16 @@ class GameManager:
         self.foods.append(new_food)
 
     def get_score(self) -> int:
-        return self.snake.length - SNAKE_INITIAL_LENGTH
+        return self.snake.length - config.SNAKE_INITIAL_LENGTH
 
     def handle_event(self, event: pygame.event.Event) -> None:
         if self.end == 0:
             if event.type == pygame.KEYDOWN:
                 if event.key in [pygame.K_UP, pygame.K_w]:
-                    self.set_snake_orientation(SNAKE_UP)
+                    self.set_snake_orientation(SnakeOrientation.UP)
                 elif event.key in [pygame.K_LEFT, pygame.K_a]:
-                    self.set_snake_orientation(SNAKE_LEFT)
+                    self.set_snake_orientation(SnakeOrientation.LEFT)
                 elif event.key in [pygame.K_DOWN, pygame.K_s]:
-                    self.set_snake_orientation(SNAKE_DOWN)
+                    self.set_snake_orientation(SnakeOrientation.DOWN)
                 elif event.key in [pygame.K_RIGHT, pygame.K_d]:
-                    self.set_snake_orientation(SNAKE_RIGHT)
+                    self.set_snake_orientation(SnakeOrientation.RIGHT)

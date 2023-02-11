@@ -16,10 +16,10 @@ COLOR_RED = pygame.Color("red")
 COLOR_WHITE = pygame.Color("white")
 
 FOOD_COLOR = {
-    game.FOOD_TYPE_NORMAL: COLOR_GRAY,
-    game.FOOD_TYPE_DOUBLESCORE: COLOR_GOLD,
-    game.FOOD_TYPE_SLOWDOWN: COLOR_BLUE,
-    game.FOOD_TYPE_SPEEDUP: COLOR_RED,
+    game.FoodType.NORMAL: COLOR_GRAY,
+    game.FoodType.DOUBLESCORE: COLOR_GOLD,
+    game.FoodType.SLOWDOWN: COLOR_BLUE,
+    game.FoodType.SPEEDUP: COLOR_RED,
 }
 SELECTED_COLOR = COLOR_CYAN
 UNSELECT_COLOR = COLOR_GRAY
@@ -103,10 +103,10 @@ def draw_snake(surface: pygame.Surface, snake: game.Snake) -> None:
         rx2 = k2.x * config.SNAKE_SIZE + config.SNAKE_SIZE
         ry1 = k1.y * config.SNAKE_SIZE
         ry2 = k2.y * config.SNAKE_SIZE + config.SNAKE_SIZE
-        if o in [game.SNAKE_DOWN, game.SNAKE_UP]:
+        if o in [game.SnakeOrientation.DOWN, game.SnakeOrientation.UP]:
             ry1 += config.SNAKE_SIZE / 2
             ry2 -= config.SNAKE_SIZE / 2
-        if o in [game.SNAKE_LEFT, game.SNAKE_RIGHT]:
+        if o in [game.SnakeOrientation.LEFT, game.SnakeOrientation.RIGHT]:
             rx1 += config.SNAKE_SIZE / 2
             rx2 -= config.SNAKE_SIZE / 2
         fill_aarectangle(surface, COLOR_DIM_GRAY, rx1, ry1, rx2, ry2)

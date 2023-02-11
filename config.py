@@ -17,3 +17,5 @@ SSAA = 4  # SSAA 16x
 GAME_HELP_TEXT = (
     "按下方向键或WASD键移动。\n食物有四种：\n灰色无特殊效果，红色可加快速度，蓝色可减慢速度，金色可得到双倍分数。\n按下ESC退出帮助页面。"
 )
+
+SNAKE_INITIAL_LENGTH = 3
