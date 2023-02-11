@@ -1,9 +1,9 @@
 import math
 import random
-import pygame
-import config
 from enum import Enum
 from typing import Hashable, Protocol
+import pygame
+import config
 
 
 class FoodType(Enum):

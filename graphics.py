@@ -1,6 +1,6 @@
+import math
 import pygame
 import pygame.gfxdraw
-import math
 import config
 import game
 import menu

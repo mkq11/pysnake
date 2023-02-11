@@ -1,8 +1,8 @@
 import pygame
+from config import *
 import graphics
 import game
 import menu
-from config import *
 
 
 def create_start_menu() -> menu.Menu:

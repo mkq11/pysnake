@@ -1,12 +1,12 @@
-import pygame
 import math
-import config
 from typing import Optional
+import config
+import pygame
 
 
 class Menu:
     def __init__(self, selections: list[str]):
-        self.selections = selections.copy()
+        self.selections = selections[:]
         self.select_idx = 0
         self.animation_time = 0
         self.contents = []
