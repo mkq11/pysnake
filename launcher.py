@@ -65,6 +65,7 @@ def main() -> None:
     pygame.init()
     manager = game.GameManager(GAME_WIDTH, GAME_HEIGHT)
     display = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+    pygame.display.set_caption('贪吃蛇小游戏')
     end_menu = menu.Menu([""])
     clock = pygame.time.Clock()
 
