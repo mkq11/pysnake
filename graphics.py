@@ -1,6 +1,6 @@
 import math
+from typing import Optional
 import pygame
-import pygame.gfxdraw
 import config
 import game
 import menu
@@ -25,6 +25,16 @@ SELECTED_COLOR = COLOR_CYAN
 UNSELECT_COLOR = COLOR_GRAY
 
 
+def fill_rectangle(
+    surface: pygame.Surface, color: pygame.Color, rect: Optional[pygame.Rect] = None
+) -> None:
+    if rect == None:
+        rect = surface.get_rect()
+    rect_surface = pygame.Surface(rect.size, pygame.SRCALPHA)
+    rect_surface.fill(color)
+    surface.blit(rect_surface, rect.topleft)
+
+
 def fill_aarectangle(
     surface: pygame.Surface,
     color: pygame.Color,
@@ -46,15 +56,15 @@ def fill_aarectangle(
     aasurface = pygame.transform.scale(
         aasurface, (config.SSAA * width, config.SSAA * height)
     )
-    pygame.gfxdraw.box(
+    pygame.draw.rect(
         aasurface,
+        color,
         (
             round(config.SSAA * (x1 - math.floor(x1))),
             round(config.SSAA * (y1 - math.floor(y1))),
             round(config.SSAA * (x2 - x1)),
             round(config.SSAA * (y2 - y1)),
         ),
-        color,
     )
     aasurface = pygame.transform.smoothscale(aasurface, (width, height))
     surface.blit(aasurface, (math.floor(x1), math.floor(y1)))
@@ -194,8 +204,8 @@ def draw_menu(surface: pygame.Surface, game_menu: menu.Menu) -> None:
                 (base[0] - triangle_size, base[1] - triangle_size),
                 (base[0] - triangle_size, base[1] + triangle_size),
             ]
-            pygame.gfxdraw.aapolygon(surface, triangle, SELECTED_COLOR)
-            pygame.gfxdraw.filled_polygon(surface, triangle, SELECTED_COLOR)
+            pygame.draw.polygon(surface, SELECTED_COLOR, triangle)
+            pygame.draw.aalines(surface, SELECTED_COLOR, True, triangle)
 
         font = pygame.font.SysFont(config.DEFAULT_TEXT_FONT_NAME, size)
         text = font.render(selection, True, color)
@@ -210,18 +220,18 @@ def draw_end(
     draw_game(surface, manager, False)
     color = COLOR_WHITE
     color.a = 128
-    pygame.gfxdraw.box(surface, surface.get_rect(), color)
+    fill_rectangle(surface, color)
     draw_menu(surface, end_menu)
 
 
 def draw_help(surface: pygame.Surface) -> None:
     color = COLOR_CYAN
     color.a = 180
-    pygame.gfxdraw.box(surface, surface.get_rect(), color)
+    fill_rectangle(surface, color)
 
     color = COLOR_WHITE
     color.a = 230
-    pygame.gfxdraw.box(surface, surface.get_rect(), color)
+    fill_rectangle(surface, color)
 
     font_size = 25
     font = pygame.font.SysFont(config.DEFAULT_TEXT_FONT_NAME, font_size)
